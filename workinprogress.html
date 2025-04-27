@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work in Progress - Web Audio Editor</title>
+  <link rel="stylesheet" href="css/homestyles.css">
+  <link rel="stylesheet" href="css/contribute.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fas fa-music logo-icon"></i>
+        <span class="logo-text">Web Audio Editor</span>
+      </div>
+      <div class="nav-links">
+        <a href="home.html">Home</a>
+        <a href="home.html#features">Features</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="contribute-container">
+    <div class="work-in-progress">
+      <i class="fas fa-tools"></i>
+      <h1>Work in Progress</h1>
+      <p>We're currently building this page. Check back soon!</p>
+      <a href="home.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        Back to Home
+      </a>
+    </div>
+  </main>
+
+  <script src="js/page-transitions.js"></script>
+  <script src="js/include-footer.js"></script>
+  <script>
+    // Smooth scrolling for features link
+    document.addEventListener('DOMContentLoaded', function() {
+      const featuresLinks = document.querySelectorAll('a[href="home.html#features"]');
+      
+      featuresLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Store the target in sessionStorage
+          sessionStorage.setItem('scrollToFeatures', 'true');
+          
+          // Navigate to home page
+          window.location.href = 'home.html';
+        });
+      });
+    });
+  </script>
+</body>
+</html> 

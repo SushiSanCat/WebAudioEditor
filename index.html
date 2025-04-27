@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Audio Editor</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Add Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Include WaveSurfer.js -->
+  <script src="js/wavesurfer.js"></script>
+  <!-- Include our audio.js -->
+  <script src="js/audio.js"></script>
+  <!-- Include our script.js -->
+  <script src="js/script.js"></script>
+  <style>
+    /* Logo styles */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4ade80;
+      text-decoration: none;
+      margin-right: 20px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      animation: glow 2s infinite;
+    }
+
+    /* Logo text gradient animation */
+    @keyframes gradientFlow {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .logo-text {
+      background: linear-gradient(
+        90deg,
+        #4ade80 0%,
+        #eab308 50%,
+        #f97316 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 3s linear infinite;
+      font-weight: 600;
+    }
+
+    /* Header styles */
+    header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button text glow effect */
+    @keyframes glow {
+      0% { text-shadow: 0 0 1px #4ade80, 0 0 2px #4ade80; }
+      50% { text-shadow: 0 0 2px #4ade80, 0 0 4px #4ade80; }
+      100% { text-shadow: 0 0 1px #4ade80, 0 0 2px #4ade80; }
+    }
+
+    @keyframes hoverGlow {
+      0% { text-shadow: 0 0 1px #eab308, 0 0 2px #eab308; }
+      50% { text-shadow: 0 0 2px #eab308, 0 0 4px #eab308; }
+      100% { text-shadow: 0 0 1px #eab308, 0 0 2px #eab308; }
+    }
+
+    @keyframes clickPulse {
+      0% { color: #4ade80; text-shadow: 0 0 5px #4ade80, 0 0 10px #4ade80, 0 0 15px #4ade80; }
+      25% { color: #ef4444; text-shadow: 0 0 5px #ef4444, 0 0 10px #ef4444, 0 0 15px #ef4444; }
+      50% { color: #ef4444; text-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444, 0 0 30px #ef4444; }
+      75% { color: #ef4444; text-shadow: 0 0 5px #ef4444, 0 0 10px #ef4444, 0 0 15px #ef4444; }
+      100% { color: #4ade80; text-shadow: 0 0 5px #4ade80, 0 0 10px #4ade80, 0 0 15px #4ade80; }
+    }
+
+    @keyframes holdPulse {
+      0% { color: #4ade80; text-shadow: 0 0 1px #4ade80, 0 0 2px #4ade80; }
+      50% { color: #ef4444; text-shadow: 0 0 2px #ef4444, 0 0 4px #ef4444; }
+      100% { color: #4ade80; text-shadow: 0 0 1px #4ade80, 0 0 2px #4ade80; }
+    }
+
+    /* Base button styles */
+    button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #4ade80;
+      padding: 5px 10px;
+      border-radius: 4px;
+      animation: glow 2s infinite;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      font-weight: 500;
+    }
+
+    button:hover {
+      color: #eab308;
+      animation: hoverGlow 2s infinite;
+      background-color: rgba(234, 179, 8, 0.05);
+    }
+
+    button:active {
+      animation: holdPulse 0.5s infinite;
+    }
+
+    button:not(:active):not(:hover) {
+      animation: glow 2s infinite;
+    }
+
+    button i {
+      font-size: 14px;
+    }
+
+    button:disabled {
+      color: rgba(74, 222, 128, 0.3);
+      animation: none;
+      cursor: not-allowed;
+    }
+
+    button.active {
+      background-color: rgba(74, 222, 128, 0.1);
+      border: 1px solid #4ade80;
+    }
+
+    /* Dropdown menu styles */
+    .menu-item {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: rgba(30, 30, 30, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        min-width: 180px;
+        z-index: 1000;
+        margin-top: 5px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.2s, transform 0.2s;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .dropdown.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .dropdown li {
+        padding: 8px 12px;
+        cursor: pointer;
+        color: #4ade80;
+        animation: glow 2s infinite;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        font-weight: 500;
+    }
+
+    .dropdown li:hover {
+        color: #eab308;
+        animation: hoverGlow 2s infinite;
+        background-color: rgba(234, 179, 8, 0.05);
+    }
+
+    .dropdown li:active {
+        animation: holdPulse 0.5s infinite;
+    }
+
+    .dropdown li:not(:active):not(:hover) {
+        animation: glow 2s infinite;
+    }
+
+    .dropdown li:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown li i {
+        font-size: 14px;
+        width: 16px;
+    }
+
+    /* Menu bar styles */
+    .menu-bar {
+        display: flex;
+        gap: 15px;
+        background-color: transparent;
+        padding: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1000;
+    }
+
+    .menu-item button {
+        padding: 8px 15px;
+        font-weight: 500;
+        position: relative;
+    }
+
+    /* Ensure dropdowns don't get cut off */
+    .main-container {
+        position: relative;
+        overflow: visible;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background-color: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    #waveform {
+      background: transparent;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Track styles */
+    .track {
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 15px;
+      background: rgba(30, 30, 30, 0.5);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .track:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .track.mono {
+      background: rgba(30, 30, 30, 0.3);
+    }
+
+    .track.selected {
+      border: 2px solid #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+      box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+    }
+
+    .track.muted {
+      opacity: 0.6;
+    }
+
+    .track.solo {
+      border-color: #eab308;
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.3);
+    }
+
+    .track-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .track-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .track-number {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .track-type {
+      color: #4ade80;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    .track-name {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .track-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .track-controls input[type="range"] {
+      width: 120px;
+      height: 5px;
+      -webkit-appearance: none;
+      background: rgba(74, 222, 128, 0.2);
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .track-controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background: #4ade80;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .track-controls input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+    }
+
+    .control-label {
+      color: #4ade80;
+      font-size: 0.9em;
+      min-width: 30px;
+    }
+
+    .control-value {
+      color: #4ade80;
+      font-size: 0.9em;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .track-waveform {
+      height: 100px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .track-timeline {
+      height: 20px;
+      margin-top: 10px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* Track list styles */
+    #track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: calc(100vh - 300px);
+      overflow-y: auto;
+    }
+
+    .track-panel {
+      width: 260px;
+      background: #232a36;
+      border-right: 2px solid #3a4252;
+      padding: 10px 0 10px 10px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .track {
+      background: #232a36;
+      border: 1px solid #3a4252;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      padding: 10px 10px 14px 10px;
+      color: #fff;
+      min-width: 220px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .track-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .track-title {
+      font-weight: 600;
+      font-size: 1.1em;
+      letter-spacing: 0.5px;
+    }
+
+    .track-menu-btn {
+      background: none;
+      border: none;
+      color: #b0b8c1;
+      font-size: 1.1em;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .track-menu-btn:hover {
+      background: #2e3748;
+    }
+
+    .track-controls-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .mute-btn, .solo-btn {
+      flex: 1;
+      background: #2e3748;
+      border: none;
+      color: #b0b8c1;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .mute-btn.active, .mute-btn:active {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .solo-btn.active, .solo-btn:active {
+      background: #eab308;
+      color: #232a36;
+    }
+
+    .effects-btn {
+      width: 100%;
+      background: #2e3748;
+      border: none;
+      color: #b0b8c1;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .effects-btn:hover {
+      background: #4ade80;
+      color: #232a36;
+    }
+
+    .delete-btn {
+      width: 100%;
+      background: #2e3748;
+      border: none;
+      color: #ef4444;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .delete-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .slider-label {
+      font-size: 0.95em;
+      color: #b0b8c1;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .volume-slider, .pan-slider {
+      flex: 1;
+      accent-color: #4ade80;
+      height: 3px;
+      border-radius: 2px;
+      background: #3a4252;
+      outline: none;
+      margin: 0 4px;
+    }
+
+    .volume-slider::-webkit-slider-thumb, .pan-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .volume-slider::-webkit-slider-thumb:hover, .pan-slider::-webkit-slider-thumb:hover {
+      background: #eab308;
+    }
+
+    .volume-slider::-moz-range-thumb, .pan-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .volume-slider::-moz-range-thumb:hover, .pan-slider::-moz-range-thumb:hover {
+      background: #eab308;
+    }
+
+    .volume-slider::-ms-thumb, .pan-slider::-ms-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .volume-slider:focus, .pan-slider:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #4ade8044;
+    }
+
+    .waveform-panel {
+      flex: 1;
+      background: #232a36;
+      border-radius: 8px;
+      padding: 0 0 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      min-width: 400px;
+    }
+
+    .waveform-axis-labels {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 2;
+      padding: 12px 6px 12px 0;
+      font-size: 0.95em;
+      color: #b0b8c1;
+      pointer-events: none;
+      background: transparent;
+    }
+
+    .custom-waveform-bg {
+      background: linear-gradient(to bottom, #232a36 0%, #232a36 100%),
+                  repeating-linear-gradient(to bottom, #3a4252 0 2px, transparent 2px 40px);
+      border-radius: 8px;
+      margin-left: 40px;
+      min-height: 300px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Track list styles */
+    #track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Tool selection styles */
+    .tool-selection {
+      display: flex;
+      gap: 10px;
+      margin-left: 20px;
+      padding: 5px;
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .tool-btn {
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tool-btn.active {
+      background-color: rgba(74, 222, 128, 0.1);
+      border: 1px solid #4ade80;
+    }
+
+    /* Time selection display */
+    .time-selection {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 20px;
+      padding: 5px;
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .time-display {
+      font-family: monospace;
+      font-size: 14px;
+      color: #4ade80;
+    }
+
+    /* Project info */
+    .project-info {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .project-name {
+      font-weight: bold;
+      color: #4ade80;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.show {
+      display: flex !important;
+    }
+
+    .modal-content {
+      background: rgba(30, 30, 30, 0.95);
+      padding: 20px;
+      border-radius: 8px;
+      min-width: 300px;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-content h2 {
+      color: #4ade80;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      color: #4ade80;
+      margin-bottom: 8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.2);
+      color: #4ade80;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .ok-btn {
+      background: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+      border: 1px solid #4ade80;
+    }
+
+    .cancel-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid #ef4444;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Track styles */
+    .track-item {
+      background: rgba(30, 30, 30, 0.5);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .track-item:hover {
+      background: rgba(30, 30, 30, 0.7);
+    }
+
+    .track-item.selected {
+      border-color: #4ade80;
+      background: rgba(74, 222, 128, 0.1);
+    }
+
+    .track-item.recording {
+      animation: recordingPulse 1s infinite;
+    }
+
+    @keyframes recordingPulse {
+      0% { border-color: #ef4444; }
+      50% { border-color: #4ade80; }
+      100% { border-color: #ef4444; }
+    }
+
+    /* Button states */
+    .recording {
+      color: #ef4444 !important;
+      animation: recordingPulse 1s infinite !important;
+    }
+
+    .playing {
+      color: #4ade80 !important;
+      animation: playingPulse 1s infinite !important;
+    }
+
+    @keyframes recordingPulse {
+      0% { text-shadow: 0 0 5px #ef4444; }
+      50% { text-shadow: 0 0 20px #ef4444; }
+      100% { text-shadow: 0 0 5px #ef4444; }
+    }
+
+    @keyframes playingPulse {
+      0% { text-shadow: 0 0 5px #4ade80; }
+      50% { text-shadow: 0 0 20px #4ade80; }
+      100% { text-shadow: 0 0 5px #4ade80; }
+    }
+
+    /* Select button styles */
+    .select-btn {
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .select-btn.active {
+      background-color: rgba(74, 222, 128, 0.2);
+      border: 1px solid #4ade80;
+    }
+
+    .select-btn i {
+      margin-right: 5px;
+    }
+
+    .select-btn:hover {
+      background-color: rgba(74, 222, 128, 0.1);
+    }
+
+    .select-btn.active:hover {
+      background-color: rgba(74, 222, 128, 0.3);
+    }
+
+    body {
+      background: #181c23;
+      color: #e0e6ed;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      background: #232a36;
+      padding: 8px 12px;
+      border-bottom: 2px solid #2e3748;
+      gap: 6px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .toolbar button {
+      background: #2e3748;
+      border: none;
+      color: #b0b8c1;
+      font-size: 1.2em;
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin: 0 1px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .toolbar button:active, .toolbar button.active {
+      background: #4ade80;
+      color: #232a36;
+    }
+    .toolbar-divider {
+      width: 2px;
+      height: 28px;
+      background: #3a4252;
+      margin: 0 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .timeline-ruler {
+      background: #232a36;
+      border-bottom: 2px solid #2e3748;
+      height: 32px;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      z-index: 10;
+    }
+    .timeline-labels {
+      display: flex;
+      align-items: flex-end;
+      height: 100%;
+      width: 100%;
+      font-size: 1em;
+      color: #b0b8c1;
+      padding-left: 260px;
+      /* align with track panel */
+    }
+    .timeline-labels span {
+      min-width: 48px;
+      text-align: center;
+      display: inline-block;
+      border-left: 1px solid #2e3748;
+      height: 100%;
+      line-height: 32px;
+    }
+    .main-container {
+      position: relative;
+      overflow: visible;
+      background: #181c23;
+    }
+    .content-container {
+      display: flex;
+      height: calc(100vh - 100px);
+      gap: 0;
+      padding: 0;
+    }
+    .track-panel {
+      width: 260px;
+      background: #232a36;
+      border-right: 2px solid #3a4252;
+      padding: 0 0 0 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .track-panel ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      flex: 1;
+    }
+    .track {
+      background: #232a36;
+      border: 1px solid #3a4252;
+      border-radius: 6px;
+      margin: 10px 10px 0 10px;
+      padding: 10px 10px 14px 10px;
+      color: #fff;
+      min-width: 220px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .track.selected {
+      border: 2px solid #4ade80;
+      box-shadow: 0 0 10px #4ade8033;
+    }
+    .track-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .track-title {
+      font-weight: 600;
+      font-size: 1.1em;
+      letter-spacing: 0.5px;
+    }
+    .track-menu-btn {
+      background: none;
+      border: none;
+      color: #b0b8c1;
+      font-size: 1.1em;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .track-menu-btn:hover {
+      background: #2e3748;
+    }
+    .track-controls-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .mute-btn, .solo-btn {
+      flex: 1;
+      background: #2e3748;
+      border: none;
+      color: #b0b8c1;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .mute-btn.active, .mute-btn:active {
+      background: #ef4444;
+      color: #fff;
+    }
+    .solo-btn.active, .solo-btn:active {
+      background: #eab308;
+      color: #232a36;
+    }
+    .effects-btn {
+      width: 100%;
+      background: #2e3748;
+      border: none;
+      color: #b0b8c1;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .effects-btn:hover {
+      background: #4ade80;
+      color: #232a36;
+    }
+    .delete-btn {
+      width: 100%;
+      background: #2e3748;
+      border: none;
+      color: #ef4444;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 4px 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .delete-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .slider-label {
+      font-size: 0.95em;
+      color: #b0b8c1;
+      min-width: 16px;
+      text-align: center;
+    }
+    .volume-slider, .pan-slider {
+      flex: 1;
+      accent-color: #4ade80;
+      height: 3px;
+      border-radius: 2px;
+      background: #3a4252;
+      outline: none;
+      margin: 0 4px;
+    }
+    .volume-slider::-webkit-slider-thumb, .pan-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .volume-slider::-webkit-slider-thumb:hover, .pan-slider::-webkit-slider-thumb:hover {
+      background: #eab308;
+    }
+    .volume-slider::-moz-range-thumb, .pan-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .volume-slider::-moz-range-thumb:hover, .pan-slider::-moz-range-thumb:hover {
+      background: #eab308;
+    }
+    .volume-slider::-ms-thumb, .pan-slider::-ms-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid #232a36;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .volume-slider:focus, .pan-slider:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #4ade8044;
+    }
+    .waveform-panel {
+      flex: 1;
+      background: #232a36;
+      border-radius: 8px;
+      padding: 0 0 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      min-width: 400px;
+    }
+    .waveform-axis-labels {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 2;
+      padding: 12px 6px 12px 0;
+      font-size: 0.95em;
+      color: #b0b8c1;
+      pointer-events: none;
+      background: transparent;
+    }
+    .custom-waveform-bg {
+      background: linear-gradient(to bottom, #232a36 0%, #232a36 100%),
+                  repeating-linear-gradient(to bottom, #3a4252 0 2px, transparent 2px 40px);
+      border-radius: 8px;
+      margin-left: 40px;
+      min-height: 300px;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Project Naming Modal -->
+  <div id="project-modal" class="modal">
+    <div class="modal-content">
+      <h2>New Project</h2>
+      <div class="input-group">
+        <label for="project-name">Project Name:</label>
+        <input type="text" id="project-name" value="Untitled Project" placeholder="Enter project name">
+      </div>
+      <div class="modal-buttons">
+        <button id="modal-ok" class="modal-btn ok-btn">
+          <i class="fas fa-check"></i> OK
+        </button>
+        <button id="modal-cancel" class="modal-btn cancel-btn">
+          <i class="fas fa-times"></i> Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <header>
+      <a href="#" class="logo">
+        <span class="logo-icon">🎵</span>
+        <span class="logo-text">Web Audio Editor</span>
+      </a>
+      <button id="home-btn"><i class="fas fa-home"></i> Home</button>
+      <nav class="menu-bar">
+        <div class="menu-item">
+          <button onclick="toggleDropdown('file-menu')"><i class="fas fa-folder"></i> File</button>
+          <ul id="file-menu" class="dropdown">
+            <li onclick="newProject()"><i class="fas fa-plus"></i> New</li>
+            <li onclick="openProject()"><i class="fas fa-folder-open"></i> Open</li>
+            <li onclick="saveProject()"><i class="fas fa-save"></i> Save</li>
+            <li onclick="exportProject()"><i class="fas fa-file-export"></i> Export</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('edit-menu')"><i class="fas fa-edit"></i> Edit</button>
+          <ul id="edit-menu" class="dropdown">
+            <li onclick="undo()"><i class="fas fa-undo"></i> Undo</li>
+            <li onclick="redo()"><i class="fas fa-redo"></i> Redo</li>
+            <li onclick="cut()"><i class="fas fa-cut"></i> Cut</li>
+            <li onclick="copy()"><i class="fas fa-copy"></i> Copy</li>
+            <li onclick="paste()"><i class="fas fa-paste"></i> Paste</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('view-menu')"><i class="fas fa-eye"></i> View</button>
+          <ul id="view-menu" class="dropdown">
+            <li onclick="zoomIn()"><i class="fas fa-search-plus"></i> Zoom In</li>
+            <li onclick="zoomOut()"><i class="fas fa-search-minus"></i> Zoom Out</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('transport-menu')"><i class="fas fa-play"></i> Transport</button>
+          <ul id="transport-menu" class="dropdown">
+            <li onclick="play()"><i class="fas fa-play"></i> Play</li>
+            <li onclick="stop()"><i class="fas fa-stop"></i> Stop</li>
+            <li onclick="record()"><i class="fas fa-microphone"></i> Record</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('tracks-menu')"><i class="fas fa-layer-group"></i> Tracks</button>
+          <ul id="tracks-menu" class="dropdown">
+            <li onclick="addStereoTrack()"><i class="fas fa-headphones"></i> Add Stereo Track</li>
+            <li onclick="addMonoTrack()"><i class="fas fa-headphones-alt"></i> Add Mono Track</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('generate-menu')"><i class="fas fa-magic"></i> Generate</button>
+          <ul id="generate-menu" class="dropdown">
+            <li onclick="generateTone()"><i class="fas fa-wave-square"></i> Tone</li>
+            <li onclick="generateNoise()"><i class="fas fa-random"></i> Noise</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('effect-menu')"><i class="fas fa-sliders-h"></i> Effect</button>
+          <ul id="effect-menu" class="dropdown">
+            <li onclick="applyReverb()"><i class="fas fa-volume-up"></i> Reverb</li>
+            <li onclick="applyEcho()"><i class="fas fa-undo"></i> Echo</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('analyze-menu')"><i class="fas fa-chart-line"></i> Analyze</button>
+          <ul id="analyze-menu" class="dropdown">
+            <li onclick="analyzeFrequency()"><i class="fas fa-wave-square"></i> Frequency Analysis</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('tools-menu')"><i class="fas fa-tools"></i> Tools</button>
+          <ul id="tools-menu" class="dropdown">
+            <li onclick="selectionTool()"><i class="fas fa-mouse-pointer"></i> Selection Tool</li>
+            <li onclick="envelopeTool()"><i class="fas fa-draw-polygon"></i> Envelope Tool</li>
+          </ul>
+        </div>
+        <div class="menu-item">
+          <button onclick="toggleDropdown('about-menu')"><i class="fas fa-info-circle"></i> About</button>
+          <ul id="about-menu" class="dropdown">
+            <li onclick="showAbout()"><i class="fas fa-info"></i> About Web Audio Editor</li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    
+    <!-- Controls section -->
+    <div class="controls-section">
+      <button id="record-btn"><i class="fas fa-microphone"></i> Record</button>
+      <button id="play-btn"><i class="fas fa-play"></i> Play</button>
+      <button id="stop-btn"><i class="fas fa-stop"></i> Stop</button>
+      <button id="undo-btn"><i class="fas fa-undo"></i> Undo</button>
+      <button id="redo-btn"><i class="fas fa-redo"></i> Redo</button>
+      
+      <!-- Tool selection -->
+      <div class="tool-selection">
+        <button id="selection-tool-btn" class="tool-btn active" title="Selection Tool">
+          <i class="fas fa-mouse-pointer"></i>
+        </button>
+        <button id="envelope-tool-btn" class="tool-btn" title="Envelope Tool">
+          <i class="fas fa-draw-polygon"></i>
+        </button>
+      </div>
+      
+      <!-- Time selection display -->
+      <div class="time-selection">
+        <span class="time-display">Start: <span id="time-selection-start">00:00:00</span></span>
+        <span class="time-display">End: <span id="time-selection-end">00:00:00</span></span>
+      </div>
+      
+      <!-- Project info -->
+      <div class="project-info">
+        <span class="project-name">Untitled Project</span>
+      </div>
+    </div>
+    
+    <div class="content-container">
+      <!-- Left Panel: Track List -->
+      <div class="track-panel">
+        <h2>Tracks</h2>
+        <ul id="track-list">
+          <li class="track" id="track-1">
+            <div class="track-header">
+              <span class="track-title">Audio 1</span>
+              <button class="track-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+            <div class="track-controls-row">
+              <button class="mute-btn">Mute</button>
+              <button class="solo-btn">Solo</button>
+            </div>
+            <button class="effects-btn">Effects</button>
+            <div class="slider-group">
+              <span class="slider-label">-</span>
+              <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1">
+              <span class="slider-label">+</span>
+            </div>
+            <div class="slider-group">
+              <span class="slider-label">L</span>
+              <input type="range" class="pan-slider" min="-1" max="1" step="0.01" value="0">
+              <span class="slider-label">R</span>
+            </div>
+          </li>
+        </ul>
+        <div class="track-controls">
+          <button id="add-mono-track-btn" class="control-btn">
+            <i class="fas fa-plus"></i> Add Mono Track
+          </button>
+          <button id="add-stereo-track-btn" class="control-btn">
+            <i class="fas fa-plus"></i> Add Stereo Track
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Panel: Waveform -->
+      <div class="waveform-panel">
+        <div class="waveform-axis-labels">
+          <span>1.0</span>
+          <span>0.5</span>
+          <span>0</span>
+          <span>-0.5</span>
+          <span>-1.0</span>
+        </div>
+        <div class="canvases">
+          <div id="waveform" class="custom-waveform-bg"></div>
+          <div id="waveform-timeline"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

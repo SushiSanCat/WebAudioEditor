@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Audio Editor - Free Audio Editor</title>
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/homestyles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Add fade-in and fade-out animations */
+    body {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    body.fade-in {
+      opacity: 1;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    /* Add smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Add animation for features section */
+    .features-section {
+      transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    }
+
+    .features-section.scroll-into-view {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fas fa-music logo-icon"></i>
+        <span class="logo-text">Web Audio Editor</span>
+      </div>
+      <div class="nav-links">
+        <a href="home.html" class="active">Home</a>
+        <a href="#features">Features</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero-section">
+    <div class="hero-content">
+      <h1>Web Audio Editor</h1>
+      <p class="tagline">Free, open-source audio editor for everyone</p>
+      <div class="cta-buttons">
+        <button class="primary-btn" onclick="navigateToEditor()">
+          <i class="fas fa-play"></i>
+          Start Editing
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="features" class="features-section">
+      <h2>Key Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="fas fa-microphone"></i>
+          <h3>Recording</h3>
+          <p>Record audio directly from your microphone or import existing files</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-cut"></i>
+          <h3>Editing</h3>
+          <p>Cut, copy, paste, and trim your audio with precision</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-sliders-h"></i>
+          <h3>Effects</h3>
+          <p>Apply professional audio effects and filters</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-wave-square"></i>
+          <h3>Waveform</h3>
+          <p>Visualize your audio with detailed waveform display</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <h2>Ready to Start?</h2>
+      <p>Begin your audio editing journey today</p>
+      <div class="cta-button-container">
+        <button class="primary-btn" onclick="navigateToEditor()">
+          <i class="fas fa-play"></i>
+          Launch Editor
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Web Audio Editor</h4>
+        <p>Free, open-source audio editor for everyone</p>
+      </div>
+      <div class="footer-section">
+        <h4>Links</h4>
+        <a href="home.html#features">Features</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About</a>
+      </div>
+      <div class="footer-section">
+        <h4>Community</h4>
+        <a href="https://github.com/webaudioeditor" target="_blank">GitHub</a>
+        <a href="workinprogress.html">Contribute</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Web Audio Editor. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/page-transitions.js"></script>
+  <script>
+    // Add fade-in effect on page load
+    window.addEventListener('load', () => {
+      document.body.classList.add('fade-in');
+    });
+
+    // Add fade-out effect when navigating to another page
+    function navigateToEditor() {
+      document.body.classList.remove('fade-in');
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 500);
+    }
+  </script>
+</body>
+</html>
