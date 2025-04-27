@@ -17,7 +17,8 @@ Welcome to **WebAudioEditor**, an intuitive, browser-based audio editor designed
 
 ## 📸 Preview
 
-[1Home page1](https://github.com/user-attachments/assets/dcdbbe24-04ce-4b34-a1f3-c5bb52ce0f20)
+![1Home page1](https://github.com/user-attachments/assets/a41f0d75-b527-4df6-8c2f-95c92b5d7eac)
+
 
 
 ---
